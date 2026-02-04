@@ -62,7 +62,7 @@
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 60px;
-      cursor: ew-resize;
+      /* cursor: ew-resize; */
     }
 
     .hero-section img {
@@ -81,7 +81,11 @@
     .hero-section .after-img {
       z-index: 2;
       clip-path: inset(0 0 0 50%);
-      transition: clip-path 0.2s;
+    }
+
+    .hero-section,
+    .slider-handle {
+      user-select: none;
     }
 
     /* Slider handle */
@@ -117,12 +121,13 @@
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 4px;
+      width: 3px;
       height: 100%;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(223, 220, 220, 0.8);
       z-index: 3;
       opacity: 0;
       transition: opacity 0.2s;
+      cursor: ew-resize;
 
     }
 
@@ -130,6 +135,28 @@
     .hero-section:hover .slider-line {
       opacity: 1;
     }
+
+    .hero-label {
+      position: absolute;
+      bottom: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-weight: 600;
+
+    }
+
+    .hero-label.before {
+      left: 20px;
+      z-index: 1;
+    }
+
+    .hero-label.after {
+      right: 20px;
+      z-index: 2;
+    }
+
 
     /* TITLE */
     .title {
@@ -209,26 +236,30 @@
 
     <!-- HERO -->
     <div class="hero-section">
-      <img class="before-img" src="imgs/eye_before.webp" alt="Before">
-      <img class="after-img" src="imgs/eye_after.webp" alt="After">
+      <img class="before-img" src="imgs/thumb2_before.webp" alt="Before">
+      <img class="after-img" src="imgs/thumb2_after.webp" alt="After">
       <div class="slider-line">
         <div class="slider-handle">
           <span class="arrow left">‹</span>
           <span class="arrow right">›</span>
         </div>
       </div>
+      <div class="hero-label before">Before</div>
+      <div class="hero-label after">After</div>
+
     </div>
 
     <div class="title">Before & After Examples</div>
 
     <!-- GALLERY -->
     <div class="gallery">
-      <div class="gallery-item active" data-before="imgs/eye_before.webp" data-after="imgs/eye_after.webp">
-        <img src="imgs/thumb1.webp">
-      </div>
 
       <div class="gallery-item" data-before="imgs/thumb2_before.webp" data-after="imgs/thumb2_after.webp">
         <img src="imgs/thumb2.webp">
+      </div>
+
+      <div class="gallery-item active" data-before="imgs/eye_before.webp" data-after="imgs/eye_after.webp">
+        <img src="imgs/thumb1.webp">
       </div>
 
       <div class="gallery-item" data-before="imgs/thumb3_before.webp" data-after="imgs/thumb3_after.webp">
@@ -243,7 +274,6 @@
     const galleryItems = document.querySelectorAll(".gallery-item");
     const beforeImg = document.querySelector(".before-img");
     const afterImg = document.querySelector(".after-img");
-    const sliderLine = document.querySelector(".slider-line");
 
     galleryItems.forEach(item => {
       item.addEventListener("click", () => {
@@ -262,27 +292,48 @@
 
     // DRAGGABLE SLIDER
     const slider = document.querySelector(".hero-section");
-    let isDragging = false;
+    const sliderLine = document.querySelector(".slider-line");
+    const handle = document.querySelector(".slider-handle");
 
-    const moveSlider = (x) => {
+    let isDragging = false;
+    let rafId = null;
+
+    function updateSlider(clientX) {
       const rect = slider.getBoundingClientRect();
-      let offsetX = x - rect.left;
-      if (offsetX < 0) offsetX = 0;
-      if (offsetX > rect.width) offsetX = rect.width;
-      const percent = (offsetX / rect.width) * 100;
+      let x = clientX - rect.left;
+      x = Math.max(0, Math.min(x, rect.width));
+
+      const percent = (x / rect.width) * 100;
+
       afterImg.style.clipPath = `inset(0 0 0 ${percent}%)`;
       sliderLine.style.left = `${percent}%`;
-    };
+    }
 
-    slider.addEventListener("mousedown", () => isDragging = true);
-    slider.addEventListener("mouseup", () => isDragging = false);
-    slider.addEventListener("mouseleave", () => isDragging = false);
-    slider.addEventListener("mousemove", (e) => {
-      if (isDragging) moveSlider(e.clientX);
-    });
+    function onPointerMove(e) {
+      if (!isDragging) return;
 
-    // Optional: click to move slider
-    // slider.addEventListener("click", (e) => moveSlider(e.clientX));
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => updateSlider(e.clientX));
+    }
+
+    function startDrag(e) {
+      isDragging = true;
+      slider.setPointerCapture(e.pointerId);
+    }
+
+    function endDrag(e) {
+      isDragging = false;
+      slider.releasePointerCapture(e.pointerId);
+    }
+
+    /* Drag ONLY from handle or line */
+    handle.addEventListener("pointerdown", startDrag);
+    sliderLine.addEventListener("pointerdown", startDrag);
+
+    slider.addEventListener("pointermove", onPointerMove);
+    slider.addEventListener("pointerup", endDrag);
+    slider.addEventListener("pointercancel", endDrag);
+
   </script>
 
 </body>
