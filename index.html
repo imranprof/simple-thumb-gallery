@@ -54,48 +54,81 @@
       color: #000;
     }
 
-    /* HERO */
+    /* HERO - Before & After Slider */
     .hero-section {
-      display: flex;
+      position: relative;
+      width: 100%;
       height: 80vh;
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 60px;
+      cursor: ew-resize;
     }
 
-    .hero-half {
-      width: 50%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      position: relative;
-    }
-
-    .hero-half.before {
-      background-image: url("imgs/eye_before.webp");
-    }
-
-    .hero-half.after {
-      background-image: url("imgs/eye_after.webp");
-    }
-
-    .hero-label {
+    .hero-section img {
       position: absolute;
-      bottom: 20px;
-      background: rgba(0, 0, 0, 0.6);
-      color: #fff;
-      padding: 8px 14px;
-      border-radius: 4px;
-      font-weight: 600;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    .hero-half.before .hero-label {
-      left: 20px;
+    .hero-section .before-img {
+      z-index: 1;
     }
 
-    .hero-half.after .hero-label {
-      right: 20px;
+    .hero-section .after-img {
+      z-index: 2;
+      clip-path: inset(0 0 0 50%);
+      transition: clip-path 0.2s;
+    }
+
+    /* Slider handle */
+    .slider-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px;
+      height: 44px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      cursor: ew-resize;
+    }
+
+    /* Arrows */
+    .slider-handle .arrow {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* Make slider line thinner & cleaner */
+    .slider-line {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.2s;
+
+    }
+
+
+    .hero-section:hover .slider-line {
+      opacity: 1;
     }
 
     /* TITLE */
@@ -176,11 +209,13 @@
 
     <!-- HERO -->
     <div class="hero-section">
-      <div class="hero-half before">
-        <div class="hero-label">Before</div>
-      </div>
-      <div class="hero-half after">
-        <div class="hero-label">After</div>
+      <img class="before-img" src="imgs/eye_before.webp" alt="Before">
+      <img class="after-img" src="imgs/eye_after.webp" alt="After">
+      <div class="slider-line">
+        <div class="slider-handle">
+          <span class="arrow left">‹</span>
+          <span class="arrow right">›</span>
+        </div>
       </div>
     </div>
 
@@ -188,7 +223,6 @@
 
     <!-- GALLERY -->
     <div class="gallery">
-
       <div class="gallery-item active" data-before="imgs/eye_before.webp" data-after="imgs/eye_after.webp">
         <img src="imgs/thumb1.webp">
       </div>
@@ -200,38 +234,55 @@
       <div class="gallery-item" data-before="imgs/thumb3_before.webp" data-after="imgs/thumb3_after.webp">
         <img src="imgs/thumb3.webp">
       </div>
-
-      <!-- duplicate -->
-
-      <div class="gallery-item" data-before="imgs/thumb2_before.webp" data-after="imgs/thumb2_after.webp">
-        <img src="imgs/thumb2.webp">
-      </div>
-
-      <div class="gallery-item" data-before="imgs/thumb3_before.webp" data-after="imgs/thumb3_after.webp">
-        <img src="imgs/thumb3.webp">
-      </div>
-
-      <div class="gallery-item" data-before="imgs/eye_before.webp" data-after="imgs/eye_after.webp">
-        <img src="imgs/thumb1.webp">
-      </div>
     </div>
 
   </div>
 
   <script>
+    // GALLERY SWITCH
     const galleryItems = document.querySelectorAll(".gallery-item");
-    const before = document.querySelector(".hero-half.before");
-    const after = document.querySelector(".hero-half.after");
+    const beforeImg = document.querySelector(".before-img");
+    const afterImg = document.querySelector(".after-img");
+    const sliderLine = document.querySelector(".slider-line");
 
     galleryItems.forEach(item => {
       item.addEventListener("click", () => {
         galleryItems.forEach(i => i.classList.remove("active"));
         item.classList.add("active");
 
-        before.style.backgroundImage = `url(${item.dataset.before})`;
-        after.style.backgroundImage = `url(${item.dataset.after})`;
+        // Update images
+        beforeImg.src = item.dataset.before;
+        afterImg.src = item.dataset.after;
+
+        // Reset slider to middle
+        afterImg.style.clipPath = "inset(0 0 0 50%)";
+        sliderLine.style.left = "50%";
       });
     });
+
+    // DRAGGABLE SLIDER
+    const slider = document.querySelector(".hero-section");
+    let isDragging = false;
+
+    const moveSlider = (x) => {
+      const rect = slider.getBoundingClientRect();
+      let offsetX = x - rect.left;
+      if (offsetX < 0) offsetX = 0;
+      if (offsetX > rect.width) offsetX = rect.width;
+      const percent = (offsetX / rect.width) * 100;
+      afterImg.style.clipPath = `inset(0 0 0 ${percent}%)`;
+      sliderLine.style.left = `${percent}%`;
+    };
+
+    slider.addEventListener("mousedown", () => isDragging = true);
+    slider.addEventListener("mouseup", () => isDragging = false);
+    slider.addEventListener("mouseleave", () => isDragging = false);
+    slider.addEventListener("mousemove", (e) => {
+      if (isDragging) moveSlider(e.clientX);
+    });
+
+    // Optional: click to move slider
+    // slider.addEventListener("click", (e) => moveSlider(e.clientX));
   </script>
 
 </body>
