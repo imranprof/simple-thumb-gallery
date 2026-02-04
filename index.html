@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Before & After Gallery</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      background: #fff;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 20px;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    nav a {
+      margin-left: 30px;
+      text-decoration: none;
+      color: #666;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      color: #000;
+    }
+
+    /* HERO */
+    .hero-section {
+      display: flex;
+      height: 80vh;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 60px;
+    }
+
+    .hero-half {
+      width: 50%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+    }
+
+    .hero-half.before {
+      background-image: url("/imgs/eye_before.png");
+    }
+
+    .hero-half.after {
+      background-image: url("/imgs/eye_after.png");
+    }
+
+    .hero-label {
+      position: absolute;
+      top: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .hero-half.before .hero-label {
+      left: 20px;
+    }
+
+    .hero-half.after .hero-label {
+      right: 20px;
+    }
+
+    /* TITLE */
+    .title {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 40px;
+    }
+
+    /* GALLERY */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .gallery-item {
+      cursor: pointer;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 3px solid transparent;
+      transition: 0.3s;
+    }
+
+    .gallery-item.active {
+      border-color: #000;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .hero-section {
+        height: 300px;
+      }
+
+      .gallery {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <header>
+      <div class="logo">Studio</div>
+      <nav>
+        <a href="#">Home</a>
+        <a href="#">Gallery</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <div class="hero-section">
+      <div class="hero-half before">
+        <div class="hero-label">Before</div>
+      </div>
+      <div class="hero-half after">
+        <div class="hero-label">After</div>
+      </div>
+    </div>
+
+    <div class="title">Before & After Examples</div>
+
+    <!-- GALLERY -->
+    <div class="gallery">
+
+      <div class="gallery-item active" data-before="/imgs/eye_before.png" data-after="/imgs/eye_after.png">
+        <img src="/imgs/thumb1.png">
+      </div>
+
+      <div class="gallery-item" data-before="/imgs/thumb2_before.jpg" data-after="/imgs/thumb2_after.jpg">
+        <img src="/imgs/thumb2.jpg">
+      </div>
+
+      <div class="gallery-item" data-before="/imgs/thumb3_before.jpg" data-after="/imgs/thumb3_after.jpg">
+        <img src="/imgs/thumb3.jpg">
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const galleryItems = document.querySelectorAll(".gallery-item");
+    const before = document.querySelector(".hero-half.before");
+    const after = document.querySelector(".hero-half.after");
+
+    galleryItems.forEach(item => {
+      item.addEventListener("click", () => {
+        galleryItems.forEach(i => i.classList.remove("active"));
+        item.classList.add("active");
+
+        before.style.backgroundImage = `url(${item.dataset.before})`;
+        after.style.backgroundImage = `url(${item.dataset.after})`;
+      });
+    });
+  </script>
+
+</body>
+
+</html>
