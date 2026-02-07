@@ -19,16 +19,15 @@
       padding: 20px;
     }
 
-    .container {
-      max-width: 1200px;
+    .container-new {
+      max-width: 1888px;
       margin: auto;
       background: #fff;
-      padding: 40px;
+      padding: clamp(16px, 2.08vw, 40px);
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-    /* HEADER */
+
     header {
       display: flex;
       justify-content: space-between;
@@ -54,15 +53,16 @@
       color: #000;
     }
 
-    /* HERO - Before & After Slider */
+
     .hero-section {
       position: relative;
       width: 100%;
-      height: 80vh;
+      height: 54.5vw;
+      max-height: 1047px;
       border-radius: 8px;
       overflow: hidden;
-      margin-bottom: 60px;
-      /* cursor: ew-resize; */
+      margin-bottom: clamp(40px, 7.3vw, 140px);
+
     }
 
     .hero-section img {
@@ -88,7 +88,7 @@
       user-select: none;
     }
 
-    /* Slider handle */
+
     .slider-handle {
       position: absolute;
       top: 50%;
@@ -104,18 +104,20 @@
       padding: 0 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
       cursor: ew-resize;
+      touch-action: none;
     }
 
-    /* Arrows */
+
     .slider-handle .arrow {
       font-size: 20px;
       font-weight: bold;
       color: #333;
       user-select: none;
       pointer-events: none;
+      transform: translate(0, -3px);
     }
 
-    /* Make slider line thinner & cleaner */
+
     .slider-line {
       position: absolute;
       top: 0;
@@ -128,6 +130,7 @@
       opacity: 0;
       transition: opacity 0.2s;
       cursor: ew-resize;
+      touch-action: none;
 
     }
 
@@ -138,34 +141,33 @@
 
     .hero-label {
       position: absolute;
-      bottom: 20px;
-      background: rgba(0, 0, 0, 0.6);
-      color: #fff;
-      padding: 8px 14px;
-      border-radius: 4px;
-      font-weight: 600;
+      bottom: clamp(16px, 2.5vw, 48px);
+      color: #01111C;
+      font-weight: 300;
+      letter-spacing: -4%;
+      font-size: clamp(24px, 3.75vw, 72px);
 
     }
 
     .hero-label.before {
-      left: 20px;
+      left: clamp(16px, 2.5vw, 48px);
       z-index: 1;
     }
 
     .hero-label.after {
-      right: 20px;
+      right: clamp(16px, 2.5vw, 48px);
       z-index: 2;
     }
 
 
-    /* TITLE */
+
     .title {
       text-align: center;
       font-size: 28px;
-      margin-bottom: 40px;
+      margin-bottom: clamp(20px, 3.33vw, 64px);
     }
 
-    /* GALLERY */
+
     .gallery {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -186,7 +188,7 @@
 
     .gallery-item img {
       width: 100%;
-      height: 150px;
+      height: clamp(160px, 17.65vw, 339px);
       object-fit: cover;
       display: block;
     }
@@ -196,7 +198,7 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    /* RESPONSIVE */
+
     @media (max-width: 768px) {
       .hero-section {
         height: 300px;
@@ -309,22 +311,25 @@
       sliderLine.style.left = `${percent}%`;
     }
 
+    function startDrag(e) {
+      e.preventDefault();
+      isDragging = true;
+      slider.setPointerCapture(e.pointerId);
+    }
+
     function onPointerMove(e) {
       if (!isDragging) return;
 
+      e.preventDefault();
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => updateSlider(e.clientX));
-    }
-
-    function startDrag(e) {
-      isDragging = true;
-      slider.setPointerCapture(e.pointerId);
     }
 
     function endDrag(e) {
       isDragging = false;
       slider.releasePointerCapture(e.pointerId);
     }
+
 
     /* Drag ONLY from handle or line */
     handle.addEventListener("pointerdown", startDrag);
